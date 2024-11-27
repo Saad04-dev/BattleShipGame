@@ -91,6 +91,13 @@ void initialize_board(char board[GRID_SIZE][GRID_SIZE])
         }
     }
 }
+void initializeGrid(Player *player) {
+    for (int i = 0; i < GRID_SIZE; i++) {
+        for (int j = 0; j < GRID_SIZE; j++) {
+            player->grid[i][j] = ''; 
+        }
+    }
+}
 
 void display_opponent_grid(char board[GRID_SIZE][GRID_SIZE], char game_difficulty)
 {
@@ -130,7 +137,67 @@ void display_opponent_grid(char board[GRID_SIZE][GRID_SIZE], char game_difficult
         printf("\n");
     }
 }
-
+int fire(Player *opponent, int x, int y) {
+    if (opponent->grid[x][y] == 'S') {  
+        opponent->grid[x][y] = 'X'; 
+        opponent->ships_remaining--;
+        printf("Hit!\n");
+        return 1;
+    } else {
+        opponent->grid[x][y] = 'O'; 
+        printf("Miss!\n");
+        return 0;
+    }
+}
+void radar(Player *opponent, int x, int y) {
+    printf("Radar scan at (%d, %d):\n", x, y);
+    for (int i = x - 1; i <= x + 1; i++) {
+        for (int j = y - 1; j <= y + 1; j++) {
+            if (i >= 0 && i < GRID_SIZE && j >= 0 && j < GRID_SIZE) {
+                if (opponent->grid[i][j] == 'S') {
+                    printf("Ship found at (%d, %d)\n", i, j);
+                } else {
+                    printf("No ship at (%d, %d)\n", i, j);
+                }
+            }
+        }
+    }
+}
+void smoke(Player *player, int x, int y) {
+    printf("Smoke deployed at (%d, %d):\n", x, y);
+    for (int i = x - 1; i <= x + 1; i++) {
+        for (int j = y - 1; j <= y + 1; j++) {
+            if (i >= 0 && i < GRID_SIZE && j >= 0 && j < GRID_SIZE) {
+                player->grid[i][j] = 'S'; 
+            }
+        }
+    }
+}
+void artillery(Player *opponent, int x, int y) {
+    printf("Artillery strike at (%d, %d):\n", x, y);
+    for (int i = x - 1; i <= x + 1; i++) {
+        for (int j = y - 1; j <= y + 1; j++) {
+            if (i >= 0 && i < GRID_SIZE && j >= 0 && j < GRID_SIZE) {
+                fire(opponent, i, j); 
+            }
+        }
+    }
+}
+void torpedo(Player *opponent, int row_or_col, char type) {
+    printf("Torpedo strike on %s %d:\n", type == 'r' ? "row" : "column", row_or_col);
+    
+    if (type == 'r') {
+        //attack entire row
+        for (int j = 0; j < GRID_SIZE; j++) {
+            fire(opponent, row_or_col, j); 
+        }
+    } else if (type == 'c') {
+        //attack entire column
+        for (int i = 0; i < GRID_SIZE; i++) {
+            fire(opponent, i, row_or_col); 
+        }
+    }
+}
 int column_to_index(char column)
 {
     return toupper(column) - 'A';
@@ -178,7 +245,27 @@ void place_ship(char board[GRID_SIZE][GRID_SIZE], int row, int col, int size, ch
         }
     }
 }
+int validateSpecialMoveUsage(int *remaining_uses, const char *move_name) {
+    if (*remaining_uses > 0) {
+        (*remaining_uses)--; 
+        return 1;  
+    } else {
+        printf("%s move limit reached!\n", move_name);
+        return 0;  
+    }
+}
 
+// Unlock advanced moves function
+void unlockAdvancedMoves(int successful_hits, int *artillery_unlocked, int *torpedo_unlocked) {
+    if (successful_hits >= 5 && *artillery_unlocked == 0) {
+        *artillery_unlocked = 1;
+        printf("Artillery unlocked!\n");
+    }
+    if (successful_hits >= 10 && *torpedo_unlocked == 0) {
+        *torpedo_unlocked = 1;
+        printf("Torpedo unlocked!\n");
+    }
+}
 void clear_screen()
 {
 #ifdef _WIN32
