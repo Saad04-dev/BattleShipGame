@@ -94,7 +94,7 @@ void initialize_board(char board[GRID_SIZE][GRID_SIZE])
 void initializeGrid(Player *player) {
     for (int i = 0; i < GRID_SIZE; i++) {
         for (int j = 0; j < GRID_SIZE; j++) {
-            player->grid[i][j] = ''; 
+            player->grid[i][j] = ' '; 
         }
     }
 }
@@ -567,7 +567,7 @@ int main()
                 char axis;
                 int index;
                 sscanf(command, "Torpedo %c%d", &axis, &index);
-                torpedo(opponent->board, axis, index - 1);
+                torpedo(opponent, axis, index - 1);
             }
             else
             {
