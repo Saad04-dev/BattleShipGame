@@ -29,6 +29,7 @@ typedef struct {
     int numOfArtillery;
     int numOfRadars;
     int numOfSmokeScreensPerformed;
+    char grid[GRID_SIZE][GRID_SIZE];  
     Ship ships[TOTALNUMBEROFSHIPS]; // Player's ships
     char board[GRID_SIZE][GRID_SIZE]; // Player's board
     char hits[GRID_SIZE][GRID_SIZE];  // Board for tracking hits/misses
@@ -59,7 +60,7 @@ int fire(Player *opponent, int x, int y); // Fire at given coordinates
 void radar(Player *opponent, int x, int y); // Radar sweep at coordinates
 void smoke_screen(char board[GRID_SIZE][GRID_SIZE], int x, int y); // Deploy smoke screen
 void artillery(Player *opponent, int x, int y); // Artillery strike at coordinates
-void torpedo(char board[GRID_SIZE][GRID_SIZE], char axis, int index); // Torpedo strike
+void torpedo(Player *, int index, char axis); // Torpedo strike
 int validateSpecialMoveUsage(int *uses, const char *move); // Validate usage of special moves
 
 #endif // PLACEHOLDERDATA_H
