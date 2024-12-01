@@ -286,6 +286,7 @@ void place_ships_for_player(char board[GRID_SIZE][GRID_SIZE], Player *player)
                 // Validate if the ship can be placed on the grid
                 if (can_place_ship(board, row_index, col_index, ships[i].size, orient))
                 {
+                    // Clear any previous ship from the grid if placed successfully
                     place_ship(board, row_index, col_index, ships[i].size, orient, ships[i].name[0]);
 
                     // Update the occupiedCells for the player
@@ -309,7 +310,7 @@ void place_ships_for_player(char board[GRID_SIZE][GRID_SIZE], Player *player)
                 }
                 else
                 {
-                    printf("Invalid ship placement. The ship does not fit on the grid. Try again.\n");
+                    printf("Invalid ship placement. The ship does not fit on the grid or overlaps with another ship. Try again.\n");
                 }
             }
             else
@@ -322,6 +323,7 @@ void place_ships_for_player(char board[GRID_SIZE][GRID_SIZE], Player *player)
     printf("%s has finished placing their ships.\n", player->name);
     clear_screen();
 }
+
 void unlockAdvancedMoves(int successful_hits, int *artillery_unlocked, int *torpedo_unlocked) {
     if (successful_hits >= 5 && *artillery_unlocked == 0) {
         *artillery_unlocked = 1;
