@@ -16,30 +16,31 @@
 
 // Ship structure
 typedef struct {
-    char name[20];               // Name of the ship
-    char id;                     // Ship identifier
-    int size;                    // Size of the ship
-    int occupiedCells[GRID_SIZE][3]; // Coordinates of occupied cells (row, col, hit status)
+    char name[20];           // Name of the ship
+    int size;                // Size of the ship
+    char id;   
+    int occupiedCells[GRID_SIZE][2]; // Coordinates of occupied cells
 } Ship;
 
 // Player structure
 typedef struct {
-    char name[20];               // Player's name
-    int turn;                    // Indicates if it's this player's turn
-    int numOfShipsSunken;        // Number of sunken ships
-    int numOfArtillery;          // Artillery unlocked status
-    int numOfRadars;             // Radar uses remaining
-    int numOfSmokeScreensPerformed; // Number of smoke screens used
-    int numOfTorpedo;            // Torpedo unlocked status
-    char grid[GRID_SIZE][GRID_SIZE];  // Player's own grid
-    char board[GRID_SIZE][GRID_SIZE]; // Board tracking opponent's moves
-    char hits[GRID_SIZE][GRID_SIZE];  // Tracking hits and misses
-    Ship ships[TOTALNUMBEROFSHIPS];   // Player's ships
+    char name[20];
+    int turn;
+    int numOfShipsSunken;
+    int numOfArtillery;
+    int numOfRadars;
+    int numOfTorpedo;
+    int numOfSmokeScreensPerformed;
+    char grid[GRID_SIZE][GRID_SIZE];  
+    Ship ships[TOTALNUMBEROFSHIPS]; // Player's ships
+    char board[GRID_SIZE][GRID_SIZE]; // Player's board
+    char hits[GRID_SIZE][GRID_SIZE];  // Board for tracking hits/misses
+    int ships_remaining; // Remaining ships
 } Player;
-
-// Global variables
 extern char affectedArea[GRID_SIZE][GRID_SIZE];
 extern char game_difficulty;
+int isShipSunk(Ship *ship);
+void HitOrMiss(Player *attacker, Player *defender, int x, int y, char moveType, char orientation);
 
 // Function prototypes
 void displayAvailableMoves(Player *currentPlayer);
@@ -59,19 +60,13 @@ int isGameOver(Player *player1, Player *player2);
 void endGame(Player *winner);
 void gameLoop(Player *player1, Player *player2);
 
-// Functions for hit or miss mechanics
-void HitOrMiss(Player *attacker, Player *defender, int x, int y, char movetype, char orientation);
-void HitOrMissMessageDisplay(int movesuccess);
-void markAffectedArea(int x, int y, char moveType, char orientation);
-int isShipSunk(Ship *ship);
-
-// Validation functions
-int validateCoordinates(int x, int y);
-int fire(Player *opponent, int x, int y);
-void radar(Player *opponent, int x, int y);
-void smoke_screen(char board[GRID_SIZE][GRID_SIZE], int x, int y);
-void artillery(Player *opponent, int x, int y);
-void torpedo(Player *opponent, int index, char axis);
-int validateSpecialMoveUsage(int *uses, const char *move);
+// Additional function prototypes from main function
+int validateCoordinates(int x, int y); // Validation function for coordinates
+int fire(Player *opponent, int x, int y); // Fire at given coordinates
+void radar(Player *opponent, int x, int y); // Radar sweep at coordinates
+void smoke_screen(char board[GRID_SIZE][GRID_SIZE], int x, int y); // Deploy smoke screen
+void artillery(Player *opponent, int x, int y); // Artillery strike at coordinates
+void torpedo(Player *, int index, char axis); // Torpedo strike
+int validateSpecialMoveUsage(int *uses, const char *move); // Validate usage of special moves
 
 #endif // PLACEHOLDERDATA_H
