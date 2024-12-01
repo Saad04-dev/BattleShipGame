@@ -245,6 +245,65 @@ void place_ship(char board[GRID_SIZE][GRID_SIZE], int row, int col, int size, ch
         }
     }
 }
+
+void playerswitch(Player *player1, Player *player2, char game_difficulty) {
+    if (player1->turn == 1) { // Player one's turn
+        display_opponent_grid(player2->hits, game_difficulty);
+    } else if (player2->turn == 1) { // Player two's turn
+        display_opponent_grid(player1->hits, game_difficulty);
+    }
+}
+
+void HitOrMiss(Player *attacker, Player *defender, int x, int y, char moveType, char orientation) {
+    markAffectedArea(x, y, moveType, orientation);
+    int HitRegister = 0;
+
+    // Iterate over the affected area to check for hits
+    for (int i = 0; i < GRID_SIZE; i++) {
+        for (int j = 0; j < GRID_SIZE; j++) {
+            if (affectedArea[i][j] == 'X') { // Affected
+                char shipID = defender->grid[i][j]; // Get the ship identifier
+                if (shipID != '~') { // Check if there's a ship
+                    if (defender->hits[i][j] != '*') { // Ensure the cell wasn't already hit
+                        for (int k = 0; k < TOTALNUMBEROFSHIPS; k++) {
+                            if (defender->ships[k].id == shipID) {
+                                for (int m = 0; m < defender->ships[k].size; m++) {
+                                    if (defender->ships[k].occupiedCells[m][0] == i &&
+                                        defender->ships[k].occupiedCells[m][1] == j) {
+                                        defender->ships[k].occupiedCells[m][2] = 1; // Mark as hit
+                                        break;
+                                    }
+                                }
+                                defender->hits[i][j] = '*';
+                                HitRegister++;
+                                HitOrMissMessageDisplay(1);
+
+                                if (isShipSunk(&defender->ships[k])) {
+                                    printf("%s has been sunk!\n", defender->ships[k].name);
+                                    defender->numOfShipsSunken++;
+                                    attacker->numOfArtillery = 1;
+
+                                    if (defender->numOfShipsSunken == 3) { // Third ship sunken
+                                        attacker->numOfTorpedo = 1;
+                                    }
+                                }
+                                break; // Exit loop after finding the correct ship
+                            }
+                        }
+                    }
+                } else {
+                    if (defender->hits[i][j] == '~') { // Mark as miss
+                        defender->hits[i][j] = 'o';
+                    }
+                }
+            }
+        }
+    }
+    if (HitRegister == 0) {
+        HitOrMissMessageDisplay(0);
+    }
+}
+
 int validateSpecialMoveUsage(int *remaining_uses, const char *move_name) {
     if (*remaining_uses > 0) {
         (*remaining_uses)--; 
@@ -253,6 +312,50 @@ int validateSpecialMoveUsage(int *remaining_uses, const char *move_name) {
         printf("%s move limit reached!\n", move_name);
         return 0;  
     }
+}
+void HitOrMissMessageDisplay(int movesuccess) {
+    if (movesuccess == 0) { // MISS
+        printf("Miss!\n");
+    } else if (movesuccess == 1) { // HIT
+        printf("Hit!\n");
+    }
+}
+void markAffectedArea(int x, int y, char moveType, char orientation) {
+    // Reset affected grid
+    for (int i = 0; i < GRID_SIZE; i++) {
+        for (int j = 0; j < GRID_SIZE; j++) {
+            affectedArea[i][j] = '~';
+        }
+    }
+
+    // Mark affected area based on move type
+    if (moveType == 'F') { // Single cell
+        affectedArea[x][y] = 'X';
+    } else if (moveType == 'A') { // 2x2 area
+        affectedArea[x][y] = 'X';
+        if (x + 1 < GRID_SIZE) affectedArea[x + 1][y] = 'X';
+        if (y + 1 < GRID_SIZE) affectedArea[x][y + 1] = 'X';
+        if (x + 1 < GRID_SIZE && y + 1 < GRID_SIZE) affectedArea[x + 1][y + 1] = 'X';
+    } else if (moveType == 'T') {
+        if (orientation == 'H') { // Row move
+            for (int i = 0; i < GRID_SIZE; i++) {
+                affectedArea[x][i] = 'X';
+            }
+        } else if (orientation == 'V') { // Column move
+            for (int i = 0; i < GRID_SIZE; i++) {
+                affectedArea[i][y] = 'X';
+            }
+        }
+    }
+}
+
+int isShipSunk(Ship *ship) {
+    for (int i = 0; i < ship->size; i++) {
+        if (ship->occupiedCells[i][2] == 0) {
+            return 0; // Not all parts are hit
+        }
+    }
+    return 1; // All parts are hit
 }
 
 // Unlock advanced moves function
