@@ -1,0 +1,114 @@
+1. Function: displayAvailableMoves
+Signature: void displayAvailableMoves(Player *currentPlayer);
+Requirements: The currentPlayer must be initialized, and their possible moves should be known.
+Effect: Displays the available moves that the current player can make, based on the state of the game.
+
+2. Function: set_game_difficulty
+Signature: char set_game_difficulty();
+Requirements: None.
+Effect: Prompts the player to choose a difficulty level (e.g., easy, medium, or hard) and returns the selected difficulty level as a character (e.g., 'E' for easy, 'M' for medium, 'H' for hard).
+
+3. Function: get_game_difficulty
+Signature: char get_game_difficulty();
+Requirements: The game difficulty must have been set earlier using set_game_difficulty.
+Effect: Returns the currently set game difficulty.
+
+4. Function: initialize_player
+Signature: void initialize_player(Player *player);
+Requirements: The player object must be passed as a pointer to initialize its attributes (e.g., name, ships, etc.).
+Effect: Initializes the player by setting up necessary attributes, such as the player's name, ships, and other relevant data.
+
+5. Function: initialize_board
+Signature: void initialize_board(char board[GRID_SIZE][GRID_SIZE]);
+Requirements: The game board should be an empty grid, and GRID_SIZE must be defined.
+Effect: Initializes the game board to a starting state, usually by setting all cells to a default value (e.g., water or empty).
+
+6. Function: display_opponent_grid
+Signature: void display_opponent_grid(char board[GRID_SIZE][GRID_SIZE], char game_difficulty);
+Requirements: A valid game board and a game difficulty level must be passed.
+Effect: Displays the opponent's grid. The level of information shown (e.g., whether ships are visible) is dependent on the game difficulty.
+
+7. Function: column_to_index
+Signature: int column_to_index(char column);
+Requirements: A valid column character (e.g., 'A' to 'J') must be passed.
+Effect: Converts a column character (e.g., 'A') to its corresponding index (e.g., 0 for 'A', 1 for 'B').
+
+8. Function: can_place_ship
+Signature: int can_place_ship(char board[GRID_SIZE][GRID_SIZE], int row, int col, int size, char orientation);
+Requirements: The board, the starting coordinates (row, col), the ship size, and the orientation (horizontal or vertical) must be passed.
+Effect: Checks whether a ship of the given size and orientation can be placed on the board at the specified coordinates without overlapping or going out of bounds.
+
+9. Function: place_ship
+Signature: void place_ship(char board[GRID_SIZE][GRID_SIZE], int row, int col, int size, char orientation, char shipID);
+Requirements: The board, coordinates, ship size, orientation, and a ship identifier (shipID) must be passed.
+Effect: Places a ship on the board at the given coordinates and orientation, using the specified ship ID.
+
+10. Function: clear_screen
+Signature: void clear_screen();
+Requirements: None.
+Effect: Clears the screen to refresh the view for the player, typically used between game stages.
+
+11. Function: place_ships_for_player
+Signature: void place_ships_for_player(char board[GRID_SIZE][GRID_SIZE], Player *player);
+Requirements: The board and player object must be passed.
+Effect: Handles the process of placing all ships for a given player on the game board, checking for validity of placements as needed.
+
+12. Function: player_turn
+Signature: void player_turn(char opponent_board[GRID_SIZE][GRID_SIZE], Player *player);
+Requirements: The opponent’s board and the player object must be passed.
+Effect: Executes the player's turn, allowing them to make a move against the opponent’s board.
+
+13. Function: check_win
+Signature: int check_win(char board[GRID_SIZE][GRID_SIZE]);
+Requirements: A game board with ships placed must be passed.
+Effect: Checks if all the opponent’s ships have been sunk (i.e., no ships remaining on the board) and returns a value indicating if the player has won (1 for win, 0 for no win).
+
+14. Function: setupBoard
+Signature: void setupBoard(char board[SIZE][SIZE]);
+Requirements: A pointer to a 2D character array representing the game board.
+Effect: Initializes the game board by filling it with the empty character ('-'), effectively resetting the board for a new game.
+
+15. Function: printBoard
+Signature: void printBoard(char board[SIZE][SIZE], int hideShips);
+Requirements: A valid game board and a flag (hideShips) indicating whether ships should be displayed or hidden.
+Effect: Prints the game board to the screen. If hideShips is 1, ships ('S') are hidden and replaced with empty spaces ('-'); otherwise, the full board with ships is displayed. The board includes row and column labels for easier referencing.
+
+16. Function: placeShipsManual
+Signature: void placeShipsManual(char board[SIZE][SIZE]);
+Requirements: A valid game board to place ships.
+Effect: Allows the user to manually place ships on the board. The user inputs coordinates and ship orientations for each ship. The function checks if the coordinates are valid before placing the ship.
+
+17. Function: placeShipsHard
+Signature: void placeShipsHard(char board[SIZE][SIZE]);
+Requirements: A valid game board to place ships.
+Effect: Randomly places ships on the board using a more advanced strategy, which may include optimizing ship placement or considering certain areas to avoid easy patterns.
+
+18. Function: isMoveValid
+Signature: int isMoveValid(char board[SIZE][SIZE], int row, int col);
+Requirements: A valid game board and coordinates representing the move (row and column).
+Effect: Checks if a move is valid by ensuring the coordinates are within bounds and that the cell at the specified location is either empty or contains a ship. Returns 1 if valid, and 0 otherwise.
+
+19. Function: makeMove
+Signature: int makeMove(char board[SIZE][SIZE], int row, int col);
+Requirements: A valid game board and the coordinates for the move (row and column).
+Effect: Makes a move at the specified coordinates by marking the cell as hit ('*') if the move hits a ship, or miss ('O') if the move is unsuccessful. Returns 1 if the move hits a ship, and 0 if it is a miss.
+
+20. Function: getShotEasy
+Signature: Shot getShotEasy();
+Requirements: None.
+Effect: Generates a random shot for the easy difficulty, choosing random coordinates (x, y) on the board. The function does not consider prior moves and simply selects a random location.
+
+21. Function: gameFinished
+Signature: int gameFinished(char board[SIZE][SIZE]);
+Requirements: A valid game board.
+Effect: Checks if the game is finished by determining if there are any ships left on the board. Returns 1 if all ships are sunk and the game is over, otherwise returns 0.
+
+22. Function: placeShip
+Signature: void placeShip(char board[SIZE][SIZE], int x, int y, int size, int horizontal);
+Requirements: A valid game board, starting coordinates (x, y), ship size, and orientation (horizontal or vertical).
+Effect: Places a ship on the board at the specified coordinates and orientation. The ship occupies consecutive cells based on its size and orientation.
+
+23. Function: canPlaceShip
+Signature: int canPlaceShip(char board[SIZE][SIZE], int x, int y, int size, int horizontal);
+Requirements: A valid game board, starting coordinates, ship size, and orientation (horizontal or vertical).
+Effect: Checks if a ship of the specified size can be placed on the board at the given coordinates, considering the available space and the ship's orientation. If the space is blocked or out of bounds, the function will return 0; otherwise, it will return 1.
