@@ -21,10 +21,7 @@ void clear_screen();
 void place_ships_for_player(char board[GRID_SIZE][GRID_SIZE], Player *player);
 void player_turn(char opponent_board[GRID_SIZE][GRID_SIZE], Player *player);
 int check_win(char board[GRID_SIZE][GRID_SIZE]);
-void HitOrMissMessageDisplay(int movesuccess);
-void markAffectedArea(int x, int y, char moveType, char orientation);
 
-// Functions
 void displayAvailableMoves(Player *currentPlayer)
 {
     printf("\nIt's %s's turn!\n", currentPlayer->name);
@@ -256,111 +253,84 @@ void playerswitch(Player *player1, Player *player2, char game_difficulty) {
     }
 }
 
-void HitOrMiss(Player *attacker, Player *defender, int x, int y, char moveType, char orientation) {
-    markAffectedArea(x, y, moveType, orientation);
-    int HitRegister = 0;
+void clear_screen()
+{
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+}
 
-    // Iterate over the affected area to check for hits
-    for (int i = 0; i < GRID_SIZE; i++) {
-        for (int j = 0; j < GRID_SIZE; j++) {
-            if (affectedArea[i][j] == 'X') { // Affected
-                char shipID = defender->grid[i][j]; // Get the ship identifier
-                if (shipID != '~') { // Check if there's a ship
-                    if (defender->hits[i][j] != '*') { // Ensure the cell wasn't already hit
-                        for (int k = 0; k < TOTALNUMBEROFSHIPS; k++) {
-                            if (defender->ships[k].id == shipID) {
-                                for (int m = 0; m < defender->ships[k].size; m++) {
-                                    if (defender->ships[k].occupiedCells[m][0] == i &&
-                                        defender->ships[k].occupiedCells[m][1] == j) {
-                                        defender->ships[k].occupiedCells[m][2] = 1; // Mark as hit
-                                        break;
-                                    }
-                                }
-                                defender->hits[i][j] = '*';
-                                HitRegister++;
-                                HitOrMissMessageDisplay(1); 
+void place_ships_for_player(char board[GRID_SIZE][GRID_SIZE], Player *player)
+{
+    Ship ships[] = {
+        {"Carrier", CARRIER_SIZE, {{0}}},       // Size 5
+        {"Battleship", BATTLESHIP_SIZE, {{0}}}, // Size 4
+        {"Destroyer", DESTROYER_SIZE, {{0}}},   // Size 3
+        {"Submarine", SUBMARINE_SIZE, {{0}}}    // Size 2
+    };
 
-                                if (isShipSunk(&defender->ships[k])) {
-                                    printf("%s has been sunk!\n", defender->ships[k].name);
-                                    defender->numOfShipsSunken++;
-                                    attacker->numOfArtillery = 1;
+    printf("%s, place your ships on the grid!\n", player->name);
 
-                                    if (defender->numOfShipsSunken == 3) { // Third ship sunken
-                                        attacker->numOfTorpedo = 1;
-                                    }
-                                }
-                                break; // Exit loop after finding the correct ship
-                            }
+    for (int i = 0; i < TOTALNUMBEROFSHIPS; i++)
+    {
+        int valid = 0;
+        while (!valid)
+        {
+            char column;
+            int row;
+            char orientation[10]; // Adjusted to handle full word inputs like "horizontal"
+
+            printf("Enter the starting coordinates and orientation (horizontal or vertical) for your %s (size %d):\n", ships[i].name, ships[i].size);
+            printf("Example: B3 horizontal\n");
+            scanf(" %c%d %s", &column, &row, orientation); // Space before %c to skip any leading whitespace
+
+            int col_index = column_to_index(column);                    // Convert column letter to index
+            int row_index = row - 1;                                    // Adjust for 0-based index
+            char orient = (toupper(orientation[0]) == 'H') ? 'H' : 'V'; // Ensure H or V for horizontal/vertical
+
+            if (row_index >= 0 && row_index < GRID_SIZE && col_index >= 0 && col_index < GRID_SIZE)
+            {
+                // Validate if the ship can be placed on the grid
+                if (can_place_ship(board, row_index, col_index, ships[i].size, orient))
+                {
+                    place_ship(board, row_index, col_index, ships[i].size, orient, ships[i].name[0]);
+
+                    // Update the occupiedCells for the player
+                    for (int j = 0; j < ships[i].size; j++)
+                    {
+                        if (orient == 'H')
+                        {
+                            player->ships[i].occupiedCells[j][0] = row_index;     // Row
+                            player->ships[i].occupiedCells[j][1] = col_index + j; // Column (increment for horizontal)
+                        }
+                        else
+                        {
+                            player->ships[i].occupiedCells[j][0] = row_index + j; // Row (increment for vertical)
+                            player->ships[i].occupiedCells[j][1] = col_index;     // Column
                         }
                     }
-                } else {
-                    if (defender->hits[i][j] == '~') { // Mark as miss
-                        defender->hits[i][j] = 'o';
-                    }
+
+                    // Copy the ship details to the player's ships array
+                    player->ships[i] = ships[i];
+                    valid = 1; // Mark as valid placement
+                }
+                else
+                {
+                    printf("Invalid ship placement. The ship does not fit on the grid. Try again.\n");
                 }
             }
-        }
-    }
-    if (HitRegister == 0) {
-        HitOrMissMessageDisplay(0);
-    }
-}
-
-int validateSpecialMoveUsage(int *remaining_uses, const char *move_name) {
-    if (*remaining_uses > 0) {
-        (*remaining_uses)--; 
-        return 1;  
-    } else {
-        printf("%s move limit reached!\n", move_name);
-        return 0;  
-    }
-}
-void HitOrMissMessageDisplay(int movesuccess) {
-    if (movesuccess == 0) { // MISS
-        printf("Miss!\n");
-    } else if (movesuccess == 1) { // HIT
-        printf("Hit!\n");
-    }
-}
-void markAffectedArea(int x, int y, char moveType, char orientation) {
-    // Reset affected grid
-    for (int i = 0; i < GRID_SIZE; i++) {
-        for (int j = 0; j < GRID_SIZE; j++) {
-            affectedArea[i][j] = '~';
-        }
-    }
-
-    // Mark affected area based on move type
-    if (moveType == 'F') { // Single cell
-        affectedArea[x][y] = 'X';
-    } else if (moveType == 'A') { // 2x2 area
-        affectedArea[x][y] = 'X';
-        if (x + 1 < GRID_SIZE) affectedArea[x + 1][y] = 'X';
-        if (y + 1 < GRID_SIZE) affectedArea[x][y + 1] = 'X';
-        if (x + 1 < GRID_SIZE && y + 1 < GRID_SIZE) affectedArea[x + 1][y + 1] = 'X';
-    } else if (moveType == 'T') {
-        if (orientation == 'H') { // Row move
-            for (int i = 0; i < GRID_SIZE; i++) {
-                affectedArea[x][i] = 'X';
-            }
-        } else if (orientation == 'V') { // Column move
-            for (int i = 0; i < GRID_SIZE; i++) {
-                affectedArea[i][y] = 'X';
+            else
+            {
+                printf("Invalid coordinates. Ensure the row and column are within the grid. Try again.\n");
             }
         }
     }
-}
 
-int isShipSunk(Ship *ship) {
-    for (int i = 0; i < ship->size; i++) {
-        if (ship->occupiedCells[i][2] == 0) {
-            return 0; // Not all parts are hit
-        }
-    }
-    return 1; // All parts are hit
+    printf("%s has finished placing their ships.\n", player->name);
+    clear_screen();
 }
-
-// Unlock advanced moves function
 void unlockAdvancedMoves(int successful_hits, int *artillery_unlocked, int *torpedo_unlocked) {
     if (successful_hits >= 5 && *artillery_unlocked == 0) {
         *artillery_unlocked = 1;
@@ -379,59 +349,6 @@ void clear_screen()
     system("clear");
 #endif
 }
-
-void place_ships_for_player(char board[GRID_SIZE][GRID_SIZE], Player *player)
-{
-    // Ship definitions (assuming sizes are defined somewhere else)
-    Ship ships[] = {
-    {"Carrier", CARRIER_SIZE, 'C', {{0, 0}, {0, 1}, {0, 2}, {0, 3}, {0, 4}}},
-    {"Battleship", BATTLESHIP_SIZE, 'B', {{1, 0}, {1, 1}, {1, 2}, {1, 3}}},
-    {"Destroyer", DESTROYER_SIZE, 'D', {{2, 0}, {2, 1}, {2, 2}}},
-    {"Submarine", SUBMARINE_SIZE, 'S', {{3, 0}, {3, 1}}}
-};
-
-    printf("%s, place your ships on the grid!\n", player->name);
-    for (int i = 0; i < TOTALNUMBEROFSHIPS; i++)
-    {
-        int valid = 0;
-        while (!valid)
-        {
-            char column;
-            int row;
-            char orientation[10];
-
-            printf("Enter the starting coordinates and orientation (horizontal or vertical) for your %s (size %d):\n", ships[i].name, ships[i].size);
-            printf("Example: B3 horizontal\n");
-            scanf(" %c%d %s", &column, &row, orientation);
-
-            // Convert the column letter to an index (A -> 0, B -> 1, ..., Z -> 25)
-            int col_index = column_to_index(column);
-            int row_index = row - 1; // Convert row to 0-based index
-
-            // Convert orientation input to either 'H' for horizontal or 'V' for vertical
-            char orient = (toupper(orientation[0]) == 'H') ? 'H' : 'V';
-
-            // Check if the coordinates are valid and the ship can be placed
-            if (row_index >= 0 && row_index < GRID_SIZE && col_index >= 0 && col_index < GRID_SIZE &&
-                can_place_ship(board, row_index, col_index, ships[i].size, orient))
-            {
-                // Place the ship on the board if it's valid
-                place_ship(board, row_index, col_index, ships[i].size, orient, ships[i].name[0]);
-                valid = 1;  // Ship placed successfully, exit loop
-            }
-            else
-            {
-                // Invalid placement, ask for new coordinates
-                printf("Invalid ship placement. Try again.\n");
-            }
-        }
-    }
-
-    printf("%s has finished placing their ships.\n", player->name);
-    clear_screen();  // Optionally clear screen after placing ships
-}
-
-
 void player_turn(char opponent_board[GRID_SIZE][GRID_SIZE], Player *player)
 {
     int valid = 0;
@@ -478,13 +395,14 @@ int check_win(char board[GRID_SIZE][GRID_SIZE])
     {
         for (int j = 0; j < GRID_SIZE; j++)
         {
-            if (board[i][j] != '~' && board[i][j] != '*' && board[i][j] != 'O')
+            if (board[i][j] != '~' && board[i][j] != '*' && board[i][j] != 'o')
+            {
                 return 0;
+            }
         }
     }
     return 1;
 }
-
 int isGameOver(Player *player1, Player *player2)
 {
     if (player1->ships_remaining == 0)
@@ -516,16 +434,22 @@ void endGame(Player *winner)
 void gameLoop(Player *player1, Player *player2)
 {
     int turn = 0;
+    int successful_hits_player1 = 0;
+    int successful_hits_player2 = 0;
+
     while (1)
     {
         if (turn % 2 == 0)
         {
             printf("\n%s's turn. Opponent's grid:\n", player1->name);
-            display_opponent_grid(player2->hits, 'E');
+            display_opponent_grid(player2->hits, game_difficulty);
             displayAvailableMoves(player1);
             player_turn(player2->hits, player1);
+
+            // Count successful hits for player 1
             if (check_win(player2->hits))
             {
+                successful_hits_player1++; // Increment hit count
                 endGame(player1);
                 break;
             }
@@ -533,15 +457,20 @@ void gameLoop(Player *player1, Player *player2)
         else
         {
             printf("\n%s's turn. Opponent's grid:\n", player2->name);
-            display_opponent_grid(player1->hits, 'E');
+            display_opponent_grid(player1->hits, game_difficulty);
             displayAvailableMoves(player2);
             player_turn(player1->hits, player2);
+
+            // Count successful hits for player 2
             if (check_win(player1->hits))
             {
+                successful_hits_player2++; // Increment hit count
                 endGame(player2);
                 break;
             }
         }
+
+        // Check if the game is over based on the number of ships remaining
         if (isGameOver(player1, player2))
         {
             if (player1->ships_remaining == 0 && player2->ships_remaining == 0)
