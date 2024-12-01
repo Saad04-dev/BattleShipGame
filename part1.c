@@ -21,6 +21,8 @@ void clear_screen();
 void place_ships_for_player(char board[GRID_SIZE][GRID_SIZE], Player *player);
 void player_turn(char opponent_board[GRID_SIZE][GRID_SIZE], Player *player);
 int check_win(char board[GRID_SIZE][GRID_SIZE]);
+void HitOrMissMessageDisplay(int movesuccess);
+void markAffectedArea(int x, int y, char moveType, char orientation);
 
 // Functions
 void displayAvailableMoves(Player *currentPlayer)
@@ -276,7 +278,7 @@ void HitOrMiss(Player *attacker, Player *defender, int x, int y, char moveType, 
                                 }
                                 defender->hits[i][j] = '*';
                                 HitRegister++;
-                                HitOrMissMessageDisplay(1);
+                                HitOrMissMessageDisplay(1); 
 
                                 if (isShipSunk(&defender->ships[k])) {
                                     printf("%s has been sunk!\n", defender->ships[k].name);
@@ -380,11 +382,13 @@ void clear_screen()
 
 void place_ships_for_player(char board[GRID_SIZE][GRID_SIZE], Player *player)
 {
+    // Ship definitions (assuming sizes are defined somewhere else)
     Ship ships[] = {
-        {"Carrier", CARRIER_SIZE, {{0}}},
-        {"Battleship", BATTLESHIP_SIZE, {{0}}},
-        {"Destroyer", DESTROYER_SIZE, {{0}}},
-        {"Submarine", SUBMARINE_SIZE, {{0}}}};
+    {"Carrier", CARRIER_SIZE, 'C', {{0, 0}, {0, 1}, {0, 2}, {0, 3}, {0, 4}}},
+    {"Battleship", BATTLESHIP_SIZE, 'B', {{1, 0}, {1, 1}, {1, 2}, {1, 3}}},
+    {"Destroyer", DESTROYER_SIZE, 'D', {{2, 0}, {2, 1}, {2, 2}}},
+    {"Submarine", SUBMARINE_SIZE, 'S', {{3, 0}, {3, 1}}}
+};
 
     printf("%s, place your ships on the grid!\n", player->name);
     for (int i = 0; i < TOTALNUMBEROFSHIPS; i++)
@@ -400,26 +404,33 @@ void place_ships_for_player(char board[GRID_SIZE][GRID_SIZE], Player *player)
             printf("Example: B3 horizontal\n");
             scanf(" %c%d %s", &column, &row, orientation);
 
+            // Convert the column letter to an index (A -> 0, B -> 1, ..., Z -> 25)
             int col_index = column_to_index(column);
-            int row_index = row - 1;
+            int row_index = row - 1; // Convert row to 0-based index
+
+            // Convert orientation input to either 'H' for horizontal or 'V' for vertical
             char orient = (toupper(orientation[0]) == 'H') ? 'H' : 'V';
 
+            // Check if the coordinates are valid and the ship can be placed
             if (row_index >= 0 && row_index < GRID_SIZE && col_index >= 0 && col_index < GRID_SIZE &&
                 can_place_ship(board, row_index, col_index, ships[i].size, orient))
             {
+                // Place the ship on the board if it's valid
                 place_ship(board, row_index, col_index, ships[i].size, orient, ships[i].name[0]);
-                valid = 1;
+                valid = 1;  // Ship placed successfully, exit loop
             }
             else
             {
+                // Invalid placement, ask for new coordinates
                 printf("Invalid ship placement. Try again.\n");
             }
         }
     }
 
     printf("%s has finished placing their ships.\n", player->name);
-    clear_screen();
+    clear_screen();  // Optionally clear screen after placing ships
 }
+
 
 void player_turn(char opponent_board[GRID_SIZE][GRID_SIZE], Player *player)
 {
