@@ -270,52 +270,57 @@ void place_ships_for_player(char board[GRID_SIZE][GRID_SIZE], Player *player)
         while (!valid)
         {
             char column;
-            int row;
-            char orientation[10]; // Adjusted to handle full word inputs like "horizontal"
+            int row, orientation;
 
-            printf("Enter the starting coordinates and orientation (horizontal or vertical) for your %s (size %d):\n", ships[i].name, ships[i].size);
-            printf("Example: B3 horizontal\n");
-            scanf(" %c%d %s", &column, &row, orientation); // Space before %c to skip any leading whitespace
-
-            int col_index = column_to_index(column);                    // Convert column letter to index
-            int row_index = row - 1;                                    // Adjust for 0-based index
-            char orient = (toupper(orientation[0]) == 'H') ? 'H' : 'V'; // Ensure H or V for horizontal/vertical
-
-            if (row_index >= 0 && row_index < GRID_SIZE && col_index >= 0 && col_index < GRID_SIZE)
+            printf("\nPlace your %s (size %d):\n", ships[i].name, ships[i].size);
+            printf("Enter row (1-%d), column (A-%c), and orientation (0: vertical, 1: horizontal):\n", GRID_SIZE, 'A' + GRID_SIZE - 1);
+            
+            if (scanf(" %d %c %d", &row, &column, &orientation) != 3)
             {
-                // Validate if the ship can be placed on the grid
-                if (can_place_ship(board, row_index, col_index, ships[i].size, orient))
-                {
-                    // Clear any previous ship from the grid if placed successfully
-                    place_ship(board, row_index, col_index, ships[i].size, orient, ships[i].name[0]);
+                printf("Invalid input format. Please enter row, column, and orientation correctly.\n");
+                while (getchar() != '\n'); // Clear the input buffer
+                continue;
+            }
 
-                    // Update the occupiedCells for the player
-                    for (int j = 0; j < ships[i].size; j++)
+            int row_index = row - 1;               // Convert to 0-based index
+            int col_index = column_to_index(column); // Convert column letter to index
+
+            // Validate orientation
+            if (orientation != 0 && orientation != 1)
+            {
+                printf("Invalid orientation. Enter 0 for vertical or 1 for horizontal.\n");
+                continue;
+            }
+
+            // Check if the coordinates and placement are valid
+            if (row_index >= 0 && row_index < GRID_SIZE &&
+                col_index >= 0 && col_index < GRID_SIZE &&
+                can_place_ship(board, row_index, col_index, ships[i].size, orientation == 1 ? 'H' : 'V'))
+            {
+                // Place the ship on the board
+                place_ship(board, row_index, col_index, ships[i].size, orientation == 1 ? 'H' : 'V', ships[i].name[0]);
+
+                // Update the occupiedCells for the player
+                for (int j = 0; j < ships[i].size; j++)
+                {
+                    if (orientation == 1) // Horizontal
                     {
-                        if (orient == 'H')
-                        {
-                            player->ships[i].occupiedCells[j][0] = row_index;     // Row
-                            player->ships[i].occupiedCells[j][1] = col_index + j; // Column (increment for horizontal)
-                        }
-                        else
-                        {
-                            player->ships[i].occupiedCells[j][0] = row_index + j; // Row (increment for vertical)
-                            player->ships[i].occupiedCells[j][1] = col_index;     // Column
-                        }
+                        player->ships[i].occupiedCells[j][0] = row_index;
+                        player->ships[i].occupiedCells[j][1] = col_index + j;
                     }
+                    else // Vertical
+                    {
+                        player->ships[i].occupiedCells[j][0] = row_index + j;
+                        player->ships[i].occupiedCells[j][1] = col_index;
+                    }
+                }
 
-                    // Copy the ship details to the player's ships array
-                    player->ships[i] = ships[i];
-                    valid = 1; // Mark as valid placement
-                }
-                else
-                {
-                    printf("Invalid ship placement. The ship does not fit on the grid or overlaps with another ship. Try again.\n");
-                }
+                player->ships[i] = ships[i]; // Copy ship details to player's array
+                valid = 1;                   // Mark as successfully placed
             }
             else
             {
-                printf("Invalid coordinates. Ensure the row and column are within the grid. Try again.\n");
+                printf("Invalid ship placement. Ensure it fits on the grid and does not overlap with other ships. Try again.\n");
             }
         }
     }
