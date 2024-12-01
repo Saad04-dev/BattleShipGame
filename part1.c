@@ -253,15 +253,6 @@ void playerswitch(Player *player1, Player *player2, char game_difficulty) {
     }
 }
 
-void clear_screen()
-{
-#ifdef _WIN32
-    system("cls");
-#else
-    system("clear");
-#endif
-}
-
 void place_ships_for_player(char board[GRID_SIZE][GRID_SIZE], Player *player)
 {
     Ship ships[] = {
