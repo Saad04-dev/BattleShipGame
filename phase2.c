@@ -17,10 +17,15 @@ typedef struct {
 void setupBoard(char board[SIZE][SIZE]);
 void printBoard(char board[SIZE][SIZE], int hideShips);
 void placeShipsManual(char board[SIZE][SIZE]);
+void placeShipsEasy(char board[SIZE][SIZE]);
+void placeShipsMedium(char board[SIZE][SIZE]);
 void placeShipsHard(char board[SIZE][SIZE]);
 int isMoveValid(char board[SIZE][SIZE], int row, int col);
 int makeMove(char board[SIZE][SIZE], int row, int col);
 Shot getShotEasy();
+Shot getShotMedium(char board[SIZE][SIZE]);
+Shot getShotHard(char board[SIZE][SIZE]);
+
 int gameFinished(char board[SIZE][SIZE]);
 void placeShip(char board[SIZE][SIZE], int x, int y, int size, int horizontal);
 int canPlaceShip(char board[SIZE][SIZE], int x, int y, int size, int horizontal);
@@ -84,6 +89,34 @@ void placeShipsManual(char board[SIZE][SIZE]) {
                 printf("Invalid placement. Try again.\n");
             }
         }
+    }
+}
+// Place ships for Easy difficulty
+void placeShipsEasy(char board[SIZE][SIZE]) {
+    int shipSizes[] = {5, 4, 3, 3, 2};
+    int numShips = 5;
+
+    for (int i = 0; i < numShips; i++) {
+        int size = shipSizes[i];
+        int placed = 0;
+
+        while (!placed) {
+            int x = rand() % SIZE;
+            int y = rand() % SIZE;
+            int horizontal = rand() % 2;
+
+            if (canPlaceShip(board, x, y, size, horizontal)) {
+                placeShip(board, x, y, size, horizontal);
+                placed = 1;
+            }
+        }
+    }
+}
+// Place ships for Medium difficulty
+void placeShipsMedium(char board[SIZE][SIZE]) {
+    placeShipsEasy(board);
+    if (canPlaceShip(board, 0, 0, 3, 1)) {
+        placeShip(board, 0, 0, 3, 1);
     }
 }
 
@@ -165,6 +198,26 @@ Shot getShotEasy() {
     Shot shot;
     shot.x = rand() % SIZE;
     shot.y = rand() % SIZE;
+    return shot;
+}
+// Medium bot logic
+Shot getShotMedium(char board[SIZE][SIZE]) {
+    Shot shot;
+    static int turn = 0;
+
+    if (turn % 2 == 0) {
+        shot.x = rand() % SIZE;
+        shot.y = rand() % SIZE;
+    } else {
+        shot.x = rand() % SIZE;
+        shot.y = rand() % SIZE;
+    }
+    turn++;
+    return shot;
+}
+// Hard bot logic
+Shot getShotHard(char board[SIZE][SIZE]) {
+    Shot shot = getShotMedium(board);
     return shot;
 }
 
