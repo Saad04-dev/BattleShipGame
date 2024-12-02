@@ -1,0 +1,482 @@
+displayAvailableMoves
+
+Test Case 1:  
+- Input: Player at position (2, 2) on a 5x5 grid with no obstacles.  
+- Description: Verifies that all adjacent positions are displayed as available moves.  
+- Expected Output:
+Available moves:
+(2, 1), (2, 3), (1, 2), (3, 2)
+
+Test Case 2:  
+- Input: Player at position (0, 0) on a 5x5 grid with obstacles blocking right and down.  
+- Description: Verifies that only valid positions are displayed.  
+- Expected Output:
+Available moves:
+(1, 0), (0, 1)
+
+Test Case 3:  
+- Input: Player at position (4, 4) on a 5x5 grid with no obstacles.  
+- Description: Verifies that the moves are limited by grid boundaries.  
+- Expected Output:
+Available moves:
+(3, 4), (4, 3)
+
+Test Case 4:  
+- Input: Player with 3 remaining moves (positions: A1, B3, D5)  
+- Description: Verifies that the function displays the correct available moves for the player.  
+- Expected Output:
+Available Moves:
+A1
+B3
+D5
+
+Test Case 5:  
+- Input: Player with no remaining moves.  
+- Description: Verifies that the function correctly handles the case with no available moves.  
+- Expected Output:
+No Available Moves
+
+---
+
+set_game_difficulty
+
+Test Case 1:  
+- Input: User enters 'E' for easy.  
+- Description: Verifies that the difficulty is set to easy.  
+- Expected Output:
+Game difficulty set to Easy.
+
+Test Case 2:  
+- Input: User enters 'M' for medium.  
+- Description: Verifies that the difficulty is set to medium.  
+- Expected Output:
+Game difficulty set to Medium.
+
+Test Case 3:  
+- Input: User enters 'H' for hard.  
+- Description: Verifies that the difficulty is set to hard.  
+- Expected Output:
+Game difficulty set to Hard.
+
+---
+
+get_game_difficulty
+
+Test Case 1:  
+- Input: Difficulty is set to 'M' (Medium).  
+- Description: Verifies that the correct difficulty is returned.  
+- Expected Output:
+Medium
+
+Test Case 2:  
+- Input: Difficulty is set to 'H' (Hard).  
+- Description: Verifies that the correct difficulty is returned.  
+- Expected Output:
+Hard
+
+
+Test Case 3:  
+- Input: Difficulty is set to 'E' (Easy).  
+- Description: Verifies that the correct difficulty is returned.  
+- Expected Output:
+Easy
+
+---
+
+initialize_player
+
+Test Case 1:  
+- Input: Player object with uninitialized values.  
+- Description: Verifies that player properties are correctly initialized to defaults (e.g., score, name, and ships).  
+- Expected Output:
+Player initialized with default values.
+
+
+Test Case 2:  
+- Input: Player object with custom values before initialization.  
+- Description: Verifies that initialization overwrites custom values with defaults.  
+- Expected Output:
+Player initialized with default values.
+
+
+---
+
+initialize_board
+
+Test Case 1:  
+- Input: Uninitialized 5x5 board.  
+- Description: Verifies that the board is properly initialized with empty spaces.  
+- Expected Output:
+Board initialized:
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+
+Test Case 2:  
+- Input: Uninitialized 10x10 board.  
+- Description: Verifies that the board is properly initialized with empty spaces for a larger board.  
+- Expected Output:
+Board initialized:
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+---
+
+display_opponent_grid
+
+Test Case 1:  
+- Input: 5x5 opponent grid with some ships, difficulty set to 'Easy'.  
+- Description: Verifies that ships are hidden and the grid is displayed with appropriate difficulty settings.  
+- Expected Output:
+Opponent's grid:
+~ ~ ~ ~ ~
+~ S ~ ~ ~
+~ ~ ~ S ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+
+Test Case 2:  
+- Input: 5x5 opponent grid with some ships, difficulty set to 'Hard'.  
+- Description: Verifies that the full grid with ships is shown.  
+- Expected Output:
+Opponent's grid:
+~ ~ ~ ~ ~
+~ S ~ ~ ~
+~ ~ ~ S ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+
+---
+
+column_to_index
+
+Test Case 1:  
+- Input: Column 'A'.  
+- Description: Verifies that 'A' is correctly converted to index 0.  
+- Expected Output:
+Index: 0
+
+Test Case 2:  
+- Input: Column 'C'.  
+- Description: Verifies that 'C' is correctly converted to index 2.  
+- Expected Output:
+Index: 2
+
+Test Case 3:  
+- Input: Column 'Z'.  
+- Description: Verifies that 'Z' is correctly converted to index 25.  
+- Expected Output:
+Index: 25
+
+---
+
+can_place_ship
+
+Test Case 1:  
+- Input: Empty 5x5 board, position (2, 2), size 3, orientation 'H'.  
+- Description: Verifies that a ship of size 3 can be placed horizontally starting at (2, 2) without going out of bounds.  
+- Expected Output:  
+1 (Can place ship)
+
+Test Case 2:  
+- Input: Board with a ship at (2, 2), position (2, 2), size 3, orientation 'V'.  
+- Description: Verifies that the function detects a collision when trying to place a vertical ship.  
+- Expected Output:  
+0 (Cannot place ship)
+
+Test Case 3:  
+- Input: Board, position (4, 4), size 2, orientation 'H'.  
+- Description: Verifies that the function correctly identifies out-of-bound placement.  
+- Expected Output:  
+0 (Cannot place ship)
+
+---
+
+place_ship
+
+Test Case 1:  
+- Input: Empty 5x5 board, position (0, 0), size 3, orientation 'H', shipID 'A'.  
+- Description: Verifies that the ship is placed correctly on the board.  
+- Expected Output:  
+Board after placement:
+A A A ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+
+Test Case 2:  
+- Input: Empty 5x5 board, position (1, 1), size 2, orientation 'V', shipID 'B'.  
+- Description: Verifies vertical placement of a ship.  
+- Expected Output:  
+Board after placement:
+~ ~ ~ ~ ~
+~ B ~ ~ ~
+~ B ~ ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+
+---
+
+clear_screen
+
+Test Case 1:  
+- Input: Function call during gameplay.  
+- Description: Verifies that the screen is cleared, simulating a clean gameplay interface.  
+- Expected Output:  
+Screen cleared.
+
+---
+
+place_ships_for_player
+
+Test Case 1:  
+- Input: Empty 5x5 board, player placing ships manually.  
+- Description: Verifies that the player can place multiple ships manually without overlap.  
+- Expected Output:  
+Final board:
+A A A ~ ~
+~ B ~ ~ ~
+~ B ~ ~ ~
+C C ~ ~ ~
+~ ~ ~ ~ ~
+
+Test Case 2:  
+- Input: 5x5 board, player places overlapping ships.  
+- Description: Verifies that overlapping placements are rejected, and the player must choose again.  
+- Expected Output:  
+Invalid position. Please try again.
+
+---
+
+player_turn
+
+Test Case 1:  
+- Input: Player fires at (2, 2) on a 5x5 opponent board.  
+- Description: Verifies that the shot result is correctly displayed and updated on the opponent's board.  
+- Expected Output:  
+Shot result: Hit
+Opponent board:
+~ ~ ~ ~ ~
+~ S ~ ~ ~
+~ X ~ ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+
+Test Case 2:  
+- Input: Player fires at (4, 4) on a 5x5 opponent board.  
+- Description: Verifies that the shot result is correctly displayed as a miss.  
+- Expected Output:  
+Shot result: Miss
+Opponent board:
+~ ~ ~ ~ ~
+~ S ~ ~ ~
+~ X ~ ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ O ~
+
+---
+
+check_win
+
+Test Case 1:  
+- Input: Opponent board with all ships sunk.  
+- Description: Verifies that the function correctly detects a win.  
+- Expected Output:  
+1 (Win condition met)
+
+Test Case 2:  
+- Input: Opponent board with ships still remaining.  
+- Description: Verifies that the function correctly detects that the game is not over.  
+- Expected Output:  
+0 (Win condition not met)
+
+---
+
+setupBoard
+
+Test Case 1:  
+- Input: Empty 5x5 board.  
+- Description: Verifies that the board is initialized with '~' for a small board.  
+- Expected Output:  
+Board initialized:
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+
+Test Case 2:  
+- Input: Empty 10x10 board.  
+- Description: Verifies that the board is initialized with '~' for a larger board.  
+- Expected Output:  
+Board initialized:
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+---
+
+printBoard
+
+Test Case 1:  
+- Input: 5x5 board with some ships and `hideShips = 1`.  
+- Description: Verifies that ships are hidden when the board is printed.  
+- Expected Output:  
+Board displayed:
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+
+Test Case 2:  
+- Input: 5x5 board with some ships and `hideShips = 0`.  
+- Description: Verifies that ships are shown when the board is printed.  
+- Expected Output:  
+Board displayed:
+~ ~ ~ ~ ~
+~ S S ~ ~
+~ ~ ~ S ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+
+---
+
+placeShipsManual
+
+Test Case 1:  
+- Input: 5x5 board, user places a ship at (1,1) horizontally with size 3.  
+- Description: Verifies that the user can manually place ships without overlap.  
+- Expected Output:  
+Board after manual placement:
+~ ~ ~ ~ ~
+~ S S S ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+
+Test Case 2:  
+- Input: 5x5 board, user attempts to place a ship at an invalid position (4, 4) horizontally with size 3.  
+- Description: Verifies that the invalid placement is rejected.  
+- Expected Output:  
+Invalid position. Try again.
+
+---
+
+placeShipsHard
+
+Test Case 1:  
+- Input: Empty 5x5 board.  
+- Description: Verifies that the computer places all ships randomly on the board.  
+- Expected Output:  
+Board after hard placement:
+~ ~ S ~ ~
+~ ~ S ~ ~
+~ ~ S ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+
+---
+
+isMoveValid
+
+Test Case 1:  
+- Input: 5x5 board, move at (2, 2).  
+- Description: Verifies that the function detects a valid move on an empty square.  
+- Expected Output:  
+1 (Move valid)
+
+Test Case 2:  
+- Input: 5x5 board, move at (1, 1) on a square that was already attacked.  
+- Description: Verifies that the function detects an invalid move.  
+- Expected Output:  
+0 (Move invalid)
+
+---
+
+makeMove
+
+Test Case 1:  
+- Input: 5x5 board with a ship at (2, 2), attack at (2, 2).  
+- Description: Verifies that a hit is registered correctly.  
+- Expected Output:  
+Hit registered at (2, 2).
+
+Test Case 2:  
+- Input: 5x5 board with no ship at (3, 3), attack at (3, 3).  
+- Description: Verifies that a miss is registered correctly.  
+- Expected Output:  
+Miss registered at (3, 3).
+
+---
+
+getShotEasy
+
+Test Case 1:  
+  - Input: Using a random logic, 5x5 board.  
+- Description: Verifies that the we select a random valid position.  
+- Expected Output:  
+Row: 1, Column: 2
+
+---
+
+gameFinished
+
+Test Case 1:  
+- Input: 5x5 board with all ships sunk.  
+- Description: Verifies that the function detects the game is finished.  
+- Expected Output:  
+1 (Game finished)
+
+Test Case 2:  
+- Input: 5x5 board with remaining ships.  
+- Description: Verifies that the function detects the game is not finished.  
+- Expected Output:  
+0 (Game not finished)
+
+---
+
+placeShip
+
+Test Case 1:  
+- Input: 5x5 board, position (0, 0), size 3, horizontal = 1.  
+- Description: Verifies horizontal placement of a ship.  
+- Expected Output:  
+Board after placement:
+S S S ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+
+Test Case 2:  
+- Input: 5x5 board, position (1, 1), size 2, horizontal = 0.  
+- Description: Verifies vertical placement of a ship.  
+- Expected Output:  
+Board after placement:
+~ ~ ~ ~ ~
+~ S ~ ~ ~
+~ S ~ ~ ~
+~ ~ ~ ~ ~
+~ ~ ~ ~ ~
+
+---
+
+canPlaceShip
+
+Test Case 1:  
+- Input: 5x5 board, position (3, 3), size 2, horizontal = 1.  
+- Description: Verifies that a horizontal ship can be placed at the position.  
+- Expected Output:  
+1 (Can place ship)
+
+
+Test Case 2:  
+- Input: 5x5 board with a ship at (1, 1), position (1, 1), size 3, horizontal = 0.  
+- Description: Verifies that overlapping placement is rejected.  
+- Expected Output:  
+0 (Cannot place ship)
